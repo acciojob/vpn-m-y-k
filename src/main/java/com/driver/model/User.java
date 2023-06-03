@@ -1,7 +1,5 @@
 package com.driver.model;
 
-import org.springframework.jca.cci.connection.ConnectionHolder;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -30,7 +28,7 @@ public class User {
     List<Connection> connectionList = null;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    Country country;
+    Country originalCountry;
 
 
     public List<ServiceProvider> getServiceProviderList() {
@@ -49,12 +47,12 @@ public class User {
         this.connectionList = connectionList;
     }
 
-    public Country getCountry() {
-        return country;
+    public Country getOriginalCountry() {
+        return originalCountry;
     }
 
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setOriginalCountry(Country originalCountry) {
+        this.originalCountry = originalCountry;
     }
 
     public User() {

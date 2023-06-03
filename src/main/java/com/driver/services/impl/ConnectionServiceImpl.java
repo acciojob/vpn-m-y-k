@@ -29,7 +29,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new Exception("Already connected");
         }
         //2. Else if the countryName corresponds to the original country of the user, do nothing. This means that the user wants to connect to its original country, for which we do not require a connection. Thus, return the user as it is.
-        if (user.getCountry().toString().equalsIgnoreCase(countryName)) {
+        if (user.getOriginalCountry().toString().equalsIgnoreCase(countryName)) {
             return user;
         }
         if (user.getServiceProviderList().isEmpty()) {
@@ -90,7 +90,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             String maskedIp = receiver.getMaskedIp();
             String code = maskedIp.substring(0,3);
             code = code.toUpperCase();
-            if (code.equals(sender.getCountry().getCode())) return sender;
+            if (code.equals(sender.getOriginalCountry().getCode())) return sender;
             String countryName = "";
             CountryName[] countryNames = CountryName.values();
             for(CountryName countryName1 : countryNames){
@@ -108,10 +108,10 @@ public class ConnectionServiceImpl implements ConnectionService {
             }
             return sender;
         }
-        if (sender.getCountry().equals(receiver.getCountry())){
+        if (sender.getOriginalCountry().equals(receiver.getOriginalCountry())){
             return sender;
         }
-        String countryName = receiver.getCountry().getCountryName().toString();
+        String countryName = receiver.getOriginalCountry().getCountryName().toString();
         try {
             sender = connect(senderId,countryName);
         }catch (Exception e){
