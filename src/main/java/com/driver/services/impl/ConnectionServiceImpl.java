@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConnectionServiceImpl implements ConnectionService {
@@ -22,8 +23,8 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public User connect(int userId, String countryName) throws Exception{
 
-        User user = userRepository2.findById(userId).get();
-                ;
+        Optional<User> optionalUser = userRepository2.findById(userId);
+        User user = optionalUser.get();
         //1. If the user is already connected to any service provider, throw "Already connected" exception.
         if (user.getConnected()) {
             throw new Exception("Already connected");
