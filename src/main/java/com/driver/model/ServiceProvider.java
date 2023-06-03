@@ -1,10 +1,10 @@
 package com.driver.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "service_provider")
 public class ServiceProvider {
 
     @Id
@@ -15,18 +15,46 @@ public class ServiceProvider {
 
     @ManyToOne
     @JoinColumn
-    Admin admin;
+    private Admin admin;
 
+    @OneToMany(mappedBy = "serviceProvider",cascade = CascadeType.ALL)
+    List<Connection> connectionList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "serviceProvider",cascade = CascadeType.ALL)
+    List<Country> countryList = new ArrayList<>();
+
+    //service provider as parent in manytomany
     @ManyToMany
     @JoinColumn
-    List<User> users = null;
+    List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "serviceProvider", cascade = CascadeType.ALL)
-    List<Connection> connectionList = null;
+    public ServiceProvider() {
+    }
 
-    @OneToMany(mappedBy = "serviceProvider", cascade = CascadeType.ALL)
-    List<Country> countryList = null;
+    public ServiceProvider(int id, String name, Admin admin, List<Connection> connectionList, List<Country> countryList, List<User> users) {
+        this.id = id;
+        this.name = name;
+        this.admin = admin;
+        this.connectionList = connectionList;
+        this.countryList = countryList;
+        this.users = users;
+    }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Admin getAdmin() {
         return admin;
@@ -34,14 +62,6 @@ public class ServiceProvider {
 
     public void setAdmin(Admin admin) {
         this.admin = admin;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
     }
 
     public List<Connection> getConnectionList() {
@@ -60,26 +80,11 @@ public class ServiceProvider {
         this.countryList = countryList;
     }
 
-    public ServiceProvider() {
+    public List<User> getUsers() {
+        return users;
     }
 
-    public ServiceProvider(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

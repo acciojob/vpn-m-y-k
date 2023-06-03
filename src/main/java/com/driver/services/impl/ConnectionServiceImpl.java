@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ConnectionServiceImpl implements ConnectionService {
@@ -23,17 +22,23 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public User connect(int userId, String countryName) throws Exception{
 
-        Optional<User> optionalUser = userRepository2.findById(userId);
-        User user = optionalUser.get();
+        //Connect the user to a vpn by considering the following priority order.
         //1. If the user is already connected to any service provider, throw "Already connected" exception.
-        if (user.getConnected()) {
+        //2. Else if the countryName corresponds to the original country of the user, do nothing. This means that the user wants to connect to its original country, for which we do not require a connection. Thus, return the user as it is.
+        //3. Else, the user should be subscribed under a serviceProvider having option to connect to the given country.
+        //If the connection can not be made (As user does not have a serviceProvider or serviceProvider does not have given country, throw "Unable to connect" exception.
+        //Else, establish the connection where the maskedIp is "updatedCountryCode.serviceProviderId.userId" and return the updated user. If multiple service providers allow you to connect to the country, use the service provider having smallest id.
+
+        User user = userRepository2.findById(userId).get();
+        if (user.getMaskedIp() != null){
             throw new Exception("Already connected");
         }
-        //2. Else if the countryName corresponds to the original country of the user, do nothing. This means that the user wants to connect to its original country, for which we do not require a connection. Thus, return the user as it is.
-        if (user.getOriginalCountry().toString().equalsIgnoreCase(countryName)) {
+
+        if (countryName.equalsIgnoreCase(user.getOriginalCountry().getCountryName().toString())){
             return user;
         }
-        if (user.getServiceProviderList().isEmpty()) {
+
+        if (user.getServiceProviderList() == null){
             throw new Exception("Unable to connect");
         }
 
@@ -41,14 +46,13 @@ public class ConnectionServiceImpl implements ConnectionService {
         ServiceProvider serviceProviderWithLowestId = null;
         int lowestId = Integer.MAX_VALUE;
         Country country = null;
-
-        for (ServiceProvider serviceProvider : serviceProviderList) {
-            List<Country> countries = serviceProvider.getCountryList();
-            for (Country country1 : countries) {
-                if (country1.getCountryName().equals(countryName) && serviceProvider.getId() < lowestId) {
+        for (ServiceProvider serviceProvider : serviceProviderList){
+            List<Country> countryList = serviceProvider.getCountryList();
+            for (Country country1 : countryList){
+                if (countryName.equalsIgnoreCase(country1.getCountryName().toString()) && lowestId>serviceProvider.getId()){
                     lowestId = serviceProvider.getId();
-                    country = country1;
                     serviceProviderWithLowestId = serviceProvider;
+                    country = country1;
                 }
             }
         }
@@ -68,7 +72,6 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new Exception("Unable to connect");
         }
         return user;
-
     }
     @Override
     public User disconnect(int userId) throws Exception {
@@ -81,10 +84,13 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
         user.setMaskedIp(null);
         user.setConnected(false);
-        return userRepository2.save(user);
+        userRepository2.save(user);
+        return user;
+
     }
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
+
         User sender = userRepository2.findById(senderId).get();
         User receiver = userRepository2.findById(receiverId).get();
         if (receiver.getMaskedIp()!=null){

@@ -1,10 +1,13 @@
 package com.driver.model;// Note: Do not write @Enumerated annotation above CountryName in this model.
 
 
+import com.driver.model.CountryName;
+import com.driver.model.ServiceProvider;
+import com.driver.model.User;
+
 import javax.persistence.*;
 
 @Entity
-@Table(name = "country")
 public class Country {
 
     @Id
@@ -15,39 +18,29 @@ public class Country {
 
     private String code;
 
-
     @ManyToOne
     @JoinColumn
-    ServiceProvider serviceProvider;
+    private ServiceProvider serviceProvider;
 
     //user as parent in oneonone
     @OneToOne
     @JoinColumn
     private User user;
 
-
-    public ServiceProvider getServiceProvider() {
-        return serviceProvider;
-    }
-
-    public void setServiceProvider(ServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public Country() {
     }
 
-    public Country( CountryName countryName, String code) {
+    public Country(CountryName countryName, String code) {
         this.countryName = countryName;
         this.code = code;
+    }
+
+    public Country(int id, CountryName countryName, String code, ServiceProvider serviceProvider, User user) {
+        this.id = id;
+        this.countryName = countryName;
+        this.code = code;
+        this.serviceProvider = serviceProvider;
+        this.user = user;
     }
 
     public int getId() {
@@ -72,5 +65,21 @@ public class Country {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public ServiceProvider getServiceProvider() {
+        return serviceProvider;
+    }
+
+    public void setServiceProvider(ServiceProvider serviceProvider) {
+        this.serviceProvider = serviceProvider;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
