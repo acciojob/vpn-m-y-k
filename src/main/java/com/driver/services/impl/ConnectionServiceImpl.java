@@ -22,7 +22,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public User connect(int userId, String countryName) throws Exception{
 
-        User user = userRepository2.findById(userId).get()
+        User user = userRepository2.findById(userId).get();
                 ;
         //1. If the user is already connected to any service provider, throw "Already connected" exception.
         if (user.getConnected()) {
